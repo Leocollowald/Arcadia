@@ -1,0 +1,59 @@
+{
+    "activeFile": "map.json",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "TX Props.tsx": {
+            "scaleInDock": 1
+        },
+        "map.json": {
+            "expandedGroupLayers": [
+                64
+            ],
+            "scale": 0.75,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 4363.333333333333,
+                "y": 1693.9999999999998
+            }
+        },
+        "map.json#Grass": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Plant": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Props": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Shadow": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Shadow Plant": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Struct": {
+            "scaleInDock": 1.5
+        },
+        "map.json#TX Tileset Stone Ground": {
+            "scaleInDock": 1
+        },
+        "map.json#TX Tileset Wall": {
+            "scaleInDock": 1
+        }
+    },
+    "last.imagePath": "/home/leo/arcadiaB1/textures/map/tilesets",
+    "openFiles": [
+        "map.json"
+    ],
+    "project": "sans titre.tiled-project",
+    "recentFiles": [
+        "map.json"
+    ],
+    "tileset.embedInMap": true
+}
