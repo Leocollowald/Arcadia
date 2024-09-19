@@ -54,8 +54,6 @@ func (e *Engine) InvRendering() {
 
 	} else {
 		for i, item := range e.Dealer.Inv {
-			//text := item.Name
-			//rl.DrawText(text, 100, int32(150+i*170), 100, rl.RayWhite)
 			rl.DrawTexturePro(
 				item.Sprite,
 				rl.NewRectangle(0, 0, 64, 64),
@@ -110,8 +108,10 @@ func (e *Engine) InvRendering() {
 }
 
 func (e *Engine) SettingsRendering() {
-	rl.ClearBackground(rl.RayWhite)
-	rl.DrawText("Léo \n Thomas \n Maxime \n Ilies ", 100, 100, 50, rl.Black)
+	rl.DrawTexture(e.Sprites["SETTINGS"], 0, 0, rl.RayWhite)
+	rl.DrawText("Z : Avancer\nQ : Gauche\nD : Droite\nS : Reculer\nSHIFT + Z,Q,S,D : Dash\nE : Attaquer\nL : Ouvrir le Shop", 720, 300, 30, rl.Black)
+	rl.DrawText("Crédits :\nLéo, Thomas, Maxime, Ilies ", 720, 750, 30, rl.Black)
+	rl.DrawText("[Echap] to Exit", 1600, 1000, 30, rl.Black)
 }
 
 func (e *Engine) RenderItems() {

@@ -145,3 +145,54 @@ func (e *Engine) RenderMap() {
 		destRectangle.X, destRectangle.Y, column_counter = 0, 0, 0
 	}
 }
+
+func (e *Engine) CheckCollisionstiles() {
+
+	// Définir la hitbox du joueur
+	playerHitbox := rl.NewRectangle(e.Player.Position.X, e.Player.Position.Y, 32, 32)
+
+	tileSize := 32
+	mapWidth := 200
+	newX, newY := e.Player.Position.X, e.Player.Position.Y
+
+	collisionLayerName := "Collision Layer"
+
+	for _, layer := range e.MapJSON.Layers {
+		if layer.Name == collisionLayerName {
+			for index, tile := range layer.Data {
+				if tile != 0 {
+
+					tileX := (index%mapWidth)*tileSize - 64
+					tileY := (index/mapWidth)*tileSize - 64
+
+					tileHitbox := rl.Rectangle{
+						X:      float32(tileX),
+						Y:      float32(tileY),
+						Width:  float32(tileSize),
+						Height: float32(tileSize),
+					}
+
+					// Gestion des collisions horizontales
+					if rl.CheckCollisionRecs(playerHitbox, tileHitbox) {
+						if playerHitbox.X+playerHitbox.Width > tileHitbox.X && playerHitbox.X < tileHitbox.X {
+							newX = tileHitbox.X - playerHitbox.Width
+						} else if playerHitbox.X < tileHitbox.X+tileHitbox.Width && playerHitbox.X > tileHitbox.X {
+							newX = tileHitbox.X + tileHitbox.Width
+						}
+
+						// Gestion des collisions verticales
+						if playerHitbox.Y+playerHitbox.Height > tileHitbox.Y && playerHitbox.Y < tileHitbox.Y {
+							newY = tileHitbox.Y - playerHitbox.Height
+						} else if playerHitbox.Y < tileHitbox.Y+tileHitbox.Height && playerHitbox.Y > tileHitbox.Y {
+							newY = tileHitbox.Y + tileHitbox.Height
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Mettre à jour la position du joueur après avoir vérifié les collisions
+	e.Player.Position.X = newX
+	e.Player.Position.Y = newY
+}

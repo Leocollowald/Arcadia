@@ -14,8 +14,14 @@ var ReadHistory = 0
 
 func (e *Engine) HomeLogic() {
 
-	if rl.IsKeyPressed(rl.KeyP) {
-		e.StateMenu = SETTINGS
+	boutonXsettings := int32(900)
+	boutonYsettings := int32(830)
+	boutonLargeursettings := int32(200)
+	boutonHauteursettings := int32(150)
+	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXsettings), float32(boutonYsettings), float32(boutonLargeursettings), float32(boutonHauteursettings))) {
+			e.StateMenu = SETTINGS
+		}
 	}
 
 	//Musique
@@ -105,6 +111,14 @@ var Stamina = false
 
 func (e *Engine) InGameLogic() {
 
+	e.CheckCollisionstiles()
+
+	for i := range e.Player.Inventory {
+		if e.Player.Inventory[i].Name == "Sword" {
+			e.Player.Damage = 50
+		}
+	}
+
 	// Dealer logic
 	e.dealerCollisions()
 
@@ -178,6 +192,7 @@ func (e *Engine) InGameLogic() {
 		rl.PlayMusicStream(e.Music)
 	}
 	rl.UpdateMusicStream(e.Music)
+
 }
 
 // Inv check
@@ -217,18 +232,6 @@ var Attack = false
 
 func (e *Engine) MonsterCollisions() {
 
-	// Enlever les monstres morts
-	var newMonsters []entity.Monster
-	for _, monster := range e.Monsters {
-		if monster.Health > 0 {
-			newMonsters = append(newMonsters, monster)
-		} else {
-			rl.UnloadTexture(monster.Sprite)
-		}
-	}
-
-	e.Monsters = newMonsters
-
 	if e.Player.Health <= 0 {
 		e.StateEngine = GAMEOVER
 	}
@@ -253,7 +256,12 @@ func (e *Engine) MonsterCollisions() {
 			monster.Position.Y > e.Player.Position.Y-150 &&
 			monster.Position.Y < e.Player.Position.Y+150 {
 
-			e.NormalTalk(monster, fmt.Sprintf("%d HP", monster.Health))
+			if e.Monsters[i].Health <= 0 {
+				e.NormalTalk(monster, fmt.Sprintf("0 HP"))
+			} else {
+				e.NormalTalk(monster, fmt.Sprintf("%d HP", monster.Health))
+			}
+
 			if e.Player.Position.X < e.Monsters[i].Position.X+30 && e.Monsters[i].Health > 0 {
 				e.Monsters[i].Position.X -= 2
 			}
@@ -378,19 +386,24 @@ func (e *Engine) updatedealer() {
 }
 
 func (e *Engine) buyItem(index int) {
-	//item := e.Dealer.Inv[index]
+	item := e.Dealer.Inv[index]
 	if index < 0 || index >= len(e.Dealer.Inv) {
 		fmt.Println("Index invalide")
 		return
 	}
+
+	if e.Player.Money >= item.Price {
+		e.Player.Money -= item.Price
+		e.Player.Inventory = append(e.Player.Inventory, item)
+		fmt.Printf("Vous avez acheté %s pour %d pièces\n", item.Name, item.Price)
+	} else {
+		fmt.Println("Pas assez d'argent !")
+	}
 }
 
-/*if e.Player.Money >= item.Price {
-	e.Player.Money -= item.Price
-	e.Player.Inventory = append(e.Player.Inventory, item)
-	rl.DrawText("Vous avez acheté %s pour %d pièces\n", item.Name, item.Price, 100, 100, 30, rl.RayWhite)
-	fmt.Println(e.Player.Inventory)
-} else {
-	rl.DrawText("Pas assez d'argent !", 100, 100, 30, rl.RayWhite)
+func (e *Engine) EnableGodMode() {
+	e.Player.Health = 99999
+	e.Player.Speed = 10
+	e.Player.Money = 99999
+	e.Player.Stamina = 9999
 }
-*/

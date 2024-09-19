@@ -7,13 +7,14 @@ import (
 func (e *Engine) Load() {
 	// Chargement des textures du personnage
 	e.Player.Sprite = rl.LoadTexture("textures/entities/soldier/Soldier-Idle.png")
-	e.Sprites["BACKGROUND"] = rl.LoadTexture("textures/map/tilesets/ecran.png")
-	e.Sprites["BACKGROUNDPAUSE"] = rl.LoadTexture("textures/map/tilesets/pause.png")
-	e.Sprites["HISTORY"] = rl.LoadTexture("textures/map/tilesets/intro.png")
-	e.Sprites["DEAD"] = rl.LoadTexture("textures/map/tilesets/dead.png")
-	e.Sprites["SHOP"] = rl.LoadTexture("textures/map/tilesets/shop.png")
+	e.Sprites["BACKGROUND"] = rl.LoadTexture("textures/img/ecran.png")
+	e.Sprites["BACKGROUNDPAUSE"] = rl.LoadTexture("textures/img/pause.png")
+	e.Sprites["HISTORY"] = rl.LoadTexture("textures/img/intro.png")
+	e.Sprites["DEAD"] = rl.LoadTexture("textures/img/dead.png")
+	e.Sprites["SHOP"] = rl.LoadTexture("textures/img/shop.png")
+	e.Sprites["SETTINGS"] = rl.LoadTexture("textures/img/pause.png")
 	e.Music = rl.LoadMusicStream("sounds/music/fairy-lands-fantasy-music-in-a-magical-forest-fantasy.mp3")
-	
+
 	e.Player.SwordSound = rl.LoadSound("sounds/music/weapswrd-epee.wav")
 }
 
