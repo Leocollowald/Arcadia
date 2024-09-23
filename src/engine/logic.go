@@ -122,6 +122,8 @@ func (e *Engine) InGameLogic() {
 	// Dealer logic
 	e.dealerCollisions()
 
+	e.ChatutoCollisions()
+
 	// Mouvement
 	if rl.IsKeyDown(rl.KeyW) || rl.IsKeyDown(rl.KeyUp) {
 		e.Player.Position.Y -= e.Player.Speed
@@ -369,6 +371,38 @@ func (e *Engine) dealerCollisions() {
 		}
 	}
 }
+
+var i int = 0
+
+func (e *Engine) ChatutoCollisions() {
+
+	textechatuto := []string{
+		"Bienvenue, âme errante... Je sais que tu es perdu, confus.", "Ton dernier souvenir est celui du monde des vivants.", "Mais cette réalité t'est désormais inaccessible. Tu es mort.",
+		"Tu te trouves ici, dans le purgatoire.", "un lieu où les âmes attendent leur jugement.", "Mais ton sort n est pas encore scellé.", "Pour échapper à ce lieu entre la vie et la mort,", "tu devras accomplir une quête.", "Tu devras tuer le chef du purgatoire qui est a l'intérieur de se château.",
+		"Avant de commencer ta quête, il te faut apprendre à te déplacer dans ce lieu étrange.", "Utilise les touches Z, Q, S et D pour te déplacer.", "Avec cela, tu pourras explorer chaque recoin de ce purgatoire.",
+		"Si tu te retrouves en danger, tu peux faire une esquive rapide en appuyant sur Shift.", "Cette manoeuvre pourrait bien te sauver la vie à plus d'une reprise.", "Mais souviens-toi, elle demande de la stamina",
+		"Utilise la touche E pour attaquer.", "Tu devras combattre des créatures ici.", "Ne sous-estime pas les dangers de cet endroit.",
+		"Il y a aussi un marchand dans ce purgatoire.", "Si tu collectes les bonnes ressources, tu pourras lui acheter des objets qui te rendront plus fort.", "Vis-le régulièrement, car tu auras besoin de toute l'aide possible pour accomplir ta quête.",
+	}
+
+	if e.Chatuto.Position.X > e.Player.Position.X-100 &&
+		e.Chatuto.Position.X < e.Player.Position.X+100 &&
+		e.Chatuto.Position.Y > e.Player.Position.Y-100 &&
+		e.Chatuto.Position.Y < e.Player.Position.Y+100 {
+
+		if e.Chatuto.Name == "chatuto" {
+			if i < len(textechatuto) {
+				e.RenderDialogChatuto(e.Chatuto, textechatuto[i])
+				if rl.IsKeyPressed(rl.KeyE) {
+					i++
+				}
+			} else {
+				i = 0
+			}
+		}
+	}
+}
+
 
 func (e *Engine) NormalTalk(m entity.Monster, sentence string) {
 	e.RenderDialog(m, sentence)

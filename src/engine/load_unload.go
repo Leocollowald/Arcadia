@@ -12,7 +12,7 @@ func (e *Engine) Load() {
 	e.Sprites["HISTORY"] = rl.LoadTexture("textures/img/intro.png")
 	e.Sprites["DEAD"] = rl.LoadTexture("textures/img/dead.png")
 	e.Sprites["SHOP"] = rl.LoadTexture("textures/img/shop.png")
-	e.Sprites["SETTINGS"] = rl.LoadTexture("textures/img/pause.png")
+	e.Sprites["SETTINGS"] = rl.LoadTexture("textures/img/settings.png")
 	e.Music = rl.LoadMusicStream("sounds/music/fairy-lands-fantasy-music-in-a-magical-forest-fantasy.mp3")
 
 	e.Player.SwordSound = rl.LoadSound("sounds/music/weapswrd-epee.wav")

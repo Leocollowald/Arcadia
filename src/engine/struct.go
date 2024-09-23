@@ -31,6 +31,7 @@ type Engine struct {
 	Monsters                []entity.Monster
 	Item                    []item.Item
 	Dealer                  entity.Dealer
+	Chatuto                	entity.Chatuto
 	InitialMonsterPositions []rl.Vector2
 	InitialMonsterHealths   []int
 

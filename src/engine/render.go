@@ -32,6 +32,7 @@ func (e *Engine) InGameRendering() {
 	e.RenderMonsters()
 	e.RenderPlayer()
 	e.Displaydealer()
+	e.Displaychatuto()
 
 	rl.EndMode2D() // On finit le rendu camera
 
@@ -198,6 +199,20 @@ func (e *Engine) RenderDialogDealer(d entity.Dealer, sentence string) {
 	rl.EndMode2D()
 }
 
+func (e *Engine) RenderDialogChatuto(chatuto entity.Chatuto, sentence string) {
+	rl.BeginMode2D(e.Camera)
+
+	rl.DrawText(
+		sentence,
+		int32(chatuto.Position.X)-150,
+		int32(chatuto.Position.Y)+50,
+		10,
+		rl.RayWhite,
+	)
+
+	rl.EndMode2D()
+}
+
 func (e *Engine) Normalexplanation(m entity.Dealer, sentence string) {
 	rl.BeginMode2D(e.Camera)
 
@@ -226,4 +241,15 @@ func (e *Engine) Displaydealer() {
 		rl.DrawText(text, 100, int32(150+50), 20, rl.RayWhite)
 
 	}
+}
+
+func (e *Engine) Displaychatuto() {
+	rl.DrawTexturePro(
+		e.Chatuto.Sprite, //normal
+		rl.NewRectangle(0, 0, 100, 100),
+		rl.NewRectangle(e.Chatuto.Position.X, e.Chatuto.Position.Y, 150, 150),
+		rl.Vector2{X: 0, Y: 0},
+		0,
+		rl.White,
+	)
 }
