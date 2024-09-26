@@ -46,6 +46,10 @@ func (engine *Engine) Run() {
 				engine.GameOverLogic()
 				engine.GameOverRendering()
 
+			case END:
+				engine.EndLogic()
+				engine.EndRendering()
+
 			}
 		}
 

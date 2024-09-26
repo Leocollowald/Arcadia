@@ -2,6 +2,7 @@ package engine
 
 import (
 	"main/src/entity"
+	"strconv"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -40,12 +41,21 @@ func (e *Engine) InGameRendering() {
 	rl.DrawText(fmt.Sprintf("Money : %d $", int32(e.Player.Money)), int32(rl.GetScreenWidth())-rl.MeasureText("Money :", 515), int32(rl.GetScreenHeight())/50, 30, rl.RayWhite)     // Print the money
 	rl.DrawText(fmt.Sprintf("Health : %d", int32(e.Player.Health)), int32(rl.GetScreenWidth())-rl.MeasureText("Health :", 500), int32(rl.GetScreenHeight())/18, 30, rl.RayWhite)    // Print the health
 	rl.DrawText(fmt.Sprintf("Stamina : %d", int32(e.Player.Stamina)), int32(rl.GetScreenWidth())-rl.MeasureText("Stamina :", 443), int32(rl.GetScreenHeight())/11, 30, rl.RayWhite) // Print the stamina
+	rl.DrawText(fmt.Sprintf("Damage : %d", int32(e.Player.Damage)), int32(rl.GetScreenWidth())-rl.MeasureText("Damage :", 453), int32(rl.GetScreenHeight())/8, 30, rl.RayWhite)     // Print the damage
+	rl.DrawText(fmt.Sprintf("Speed : %d", int32(e.Player.Speed)), int32(rl.GetScreenWidth())-rl.MeasureText("Speed :", 529), int32(rl.GetScreenHeight())/6, 30, rl.RayWhite)        // Print the speed
 
 }
 
 func (e *Engine) PauseRendering() {
 	rl.DrawTexture(e.Sprites["BACKGROUNDPAUSE"], 0, 0, rl.RayWhite)
 
+}
+
+func (e *Engine) EndRendering() {
+	rl.DrawTexture(e.Sprites["END"], 0, 0, rl.RayWhite)
+	rl.DrawText("[Enter] to Continue", int32(rl.GetScreenWidth())-rl.MeasureText("[Enter] to Continue", 32), int32(rl.GetScreenHeight())/1-35, 30, rl.RayWhite)
+	e.Player.Position.X = 615
+	e.Player.Position.Y = 1600
 }
 
 func (e *Engine) InvRendering() {
@@ -75,8 +85,10 @@ func (e *Engine) InvRendering() {
 	boutonLargeurarmor := int32(150)
 	boutonHauteurarmor := int32(170)
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXarmor), float32(boutonYarmor), float32(boutonLargeurarmor), float32(boutonHauteurarmor))) {
+		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXarmor), float32(boutonYarmor), float32(boutonLargeurarmor), float32(boutonHauteurarmor))) && e.Player.Money >= e.Dealer.Inv[1].Price {
 			e.buyItem(0)
+			e.Player.Health += 100
+			e.Player.Armor++
 		}
 	}
 	boutonXsword := int32(920)
@@ -84,8 +96,10 @@ func (e *Engine) InvRendering() {
 	boutonLargeursword := int32(60)
 	boutonHauteursword := int32(350)
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXsword), float32(boutonYsword), float32(boutonLargeursword), float32(boutonHauteursword))) {
+		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXsword), float32(boutonYsword), float32(boutonLargeursword), float32(boutonHauteursword))) && e.Player.Money >= e.Dealer.Inv[0].Price {
 			e.buyItem(1)
+			e.Player.Damage += 50
+			e.Player.Sword++
 		}
 	}
 	boutonXahealpotion := int32(1070)
@@ -93,8 +107,9 @@ func (e *Engine) InvRendering() {
 	boutonLargeurahealpotion := int32(60)
 	boutonHauteurahealpotion := int32(140)
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXahealpotion), float32(boutonYahealpotion), float32(boutonLargeurahealpotion), float32(boutonHauteurahealpotion))) {
+		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXahealpotion), float32(boutonYahealpotion), float32(boutonLargeurahealpotion), float32(boutonHauteurahealpotion))) && e.Player.Money >= e.Dealer.Inv[2].Price {
 			e.buyItem(2)
+			e.Player.HealPotion++
 		}
 	}
 	boutonXaspeedpotion := int32(760)
@@ -102,15 +117,17 @@ func (e *Engine) InvRendering() {
 	boutonLargeuraspeedpotion := int32(60)
 	boutonHauteuraspeedpotion := int32(140)
 	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXaspeedpotion), float32(boutonYaspeedpotion), float32(boutonLargeuraspeedpotion), float32(boutonHauteuraspeedpotion))) {
+		if rl.CheckCollisionPointRec(rl.GetMousePosition(), rl.NewRectangle(float32(boutonXaspeedpotion), float32(boutonYaspeedpotion), float32(boutonLargeuraspeedpotion), float32(boutonHauteuraspeedpotion))) && e.Player.Money >= e.Dealer.Inv[3].Price {
 			e.buyItem(3)
+			e.Player.Speed += 1
+			e.Player.SpeedPotion++
 		}
 	}
 }
 
 func (e *Engine) SettingsRendering() {
 	rl.DrawTexture(e.Sprites["SETTINGS"], 0, 0, rl.RayWhite)
-	rl.DrawText("Z : Avancer\nQ : Gauche\nD : Droite\nS : Reculer\nSHIFT + Z,Q,S,D : Dash\nE : Attaquer\nL : Ouvrir le Shop", 720, 300, 30, rl.Black)
+	rl.DrawText("Z : Avancer\nQ : Gauche\nD : Droite\nS : Reculer\nSHIFT + Z,Q,S,D : Dash\nE : Attaquer\nL : Ouvrir le Shop\nF : Utiliser Potion de Heal", 720, 300, 30, rl.Black)
 	rl.DrawText("Crédits :\nLéo, Thomas, Maxime, Ilies ", 720, 750, 30, rl.Black)
 	rl.DrawText("[Echap] to Exit", 1600, 1000, 30, rl.Black)
 }
@@ -122,8 +139,7 @@ func (e *Engine) RenderItems() {
 
 	// Parcourir l'inventaire du joueur et afficher les items en haut à gauche
 	for i, item := range e.Player.Inventory {
-		itemText := fmt.Sprintf("%s", item.Name)
-		rl.DrawText(itemText, 10, int32(100+i*100), 20, rl.RayWhite)
+		rl.DrawText(item.Name, 10, int32(100+i*100), 20, rl.RayWhite)
 	}
 }
 
@@ -252,4 +268,33 @@ func (e *Engine) Displaychatuto() {
 		0,
 		rl.White,
 	)
+}
+
+func (e *Engine) Ciphertalk(s string) string {
+	var s2 string
+	for _, char := range s {
+		char = char + 2
+		s2 = s2 + string(char)
+	}
+	return s2
+}
+
+func (e *Engine) Robottalk(s string) string {
+	var s2 string
+	var l string
+	for _, char := range s {
+		x := int(char)
+		l = ""
+		for x/2 != 0 {
+			r := x % 2
+			l = strconv.Itoa(r) + l
+			x = x / 2
+		}
+		l = "1" + l
+		for len(l) < 8 {
+			l = "0" + l
+		}
+		s2 = s2 + l
+	}
+	return s2
 }

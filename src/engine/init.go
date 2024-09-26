@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"main/src/entity"
 	"main/src/item"
-	"time"
+	"math/rand"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-
-	"math/rand"
 )
 
 const (
@@ -42,13 +40,17 @@ func (e *Engine) Init() {
 func (e *Engine) InitEntities() {
 
 	e.Player = entity.Player{
-		Position:  rl.Vector2{X: 615, Y: 1600},
-		Health:    100,
-		Money:     0,
-		Damage:    10,
-		Speed:     4,
-		Stamina:   100,
-		Inventory: []item.Item{},
+		Position:    rl.Vector2{X: 615, Y: 1600},
+		Health:      100,
+		Money:       1000,
+		Damage:      10,
+		Speed:       4,
+		Stamina:     100,
+		Inventory:   []item.Item{},
+		Sword:       0,
+		Armor:       0,
+		HealPotion:  0,
+		SpeedPotion: 0,
 
 		IsAlive: true,
 
@@ -463,7 +465,7 @@ func (e *Engine) InitEntities() {
 	})
 
 	e.Monsters = append(e.Monsters, entity.Monster{
-		Name:     "claude",
+		Name:     "eric",
 		Position: rl.Vector2{X: 2950, Y: 1600},
 		Health:   500,
 		Damage:   50,
@@ -479,9 +481,10 @@ func (e *Engine) InitEntities() {
 		e.InitialMonsterPositions[i] = e.Monsters[i].Position
 		e.InitialMonsterHealths[i] = e.Monsters[i].Health
 	}
+	minWorth := 1
+	maxWorth := 10
 	for i := range e.Monsters {
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		e.Monsters[i].Worth = r.Intn(10)
+		e.Monsters[i].Worth = rand.Intn(maxWorth-minWorth+1) + minWorth
 	}
 }
 
@@ -546,9 +549,9 @@ func (e *Engine) InitItem() {
 }
 
 func (e *Engine) InitChatuto() {
-	e.Chatuto = entity.Chatuto {
-		Name: "chatuto",
-		Position: rl.Vector2{700, 1600},
-		Sprite: rl.LoadTexture("textures/entities/chatuto/Wizard-Idle.png"),
+	e.Chatuto = entity.Chatuto{
+		Name:     "chatuto",
+		Position: rl.Vector2{X: 700, Y: 1600},
+		Sprite:   rl.LoadTexture("textures/entities/chatuto/Wizard-Idle.png"),
 	}
 }

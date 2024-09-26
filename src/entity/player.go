@@ -8,14 +8,18 @@ import (
 )
 
 type Player struct {
-	Position  rl.Vector2
-	Health    int
-	Money     int
-	Damage    int
-	Speed     float32
-	Inventory []item.Item
-	Stamina   int
-	Alive     bool
+	Position    rl.Vector2
+	Health      int
+	Money       int
+	Damage      int
+	Speed       float32
+	Inventory   []item.Item
+	Stamina     int
+	Alive       bool
+	Sword       int
+	Armor       int
+	HealPotion  int
+	SpeedPotion int
 
 	SwordSound rl.Sound
 

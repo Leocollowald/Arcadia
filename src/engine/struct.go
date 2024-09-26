@@ -24,6 +24,7 @@ const (
 	GAMEOVER engine = iota
 	INV      engine = iota
 	DEALER   engine = iota
+	END      engine = iota
 )
 
 type Engine struct {
@@ -31,9 +32,11 @@ type Engine struct {
 	Monsters                []entity.Monster
 	Item                    []item.Item
 	Dealer                  entity.Dealer
-	Chatuto                	entity.Chatuto
+	Chatuto                 entity.Chatuto
 	InitialMonsterPositions []rl.Vector2
 	InitialMonsterHealths   []int
+	InitialMonsterWorths    []int
+	InitialPlayerHealths    int
 
 	Music       rl.Music
 	MusicVolume float32

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/src/entity"
 	"math"
+	"math/rand"
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -63,6 +64,13 @@ func (e *Engine) HomeLogic() {
 	}
 }
 
+func (e *Engine) EndLogic() {
+	if rl.IsKeyDown(rl.KeyEnter) {
+		e.StateMenu = HOME
+		rl.StopMusicStream(e.Music)
+	}
+}
+
 func (e *Engine) PauseLogic() {
 	//Menus
 	if rl.IsKeyPressed(rl.KeyEscape) || rl.IsKeyPressed(rl.KeyP) {
@@ -108,21 +116,48 @@ func (e *Engine) SettingsLogic() {
 }
 
 var Stamina = false
+var Heal = false
 
 func (e *Engine) InGameLogic() {
 
 	e.CheckCollisionstiles()
 
-	for i := range e.Player.Inventory {
-		if e.Player.Inventory[i].Name == "Sword" {
-			e.Player.Damage = 50
-		}
-	}
-
-	// Dealer logic
+	// Dealer
 	e.dealerCollisions()
 
+	// Chatuto
 	e.ChatutoCollisions()
+
+	e.CheckCollisions()
+
+	// Afficher l'inventaire
+	for i := range e.Player.Inventory {
+		if e.Player.Inventory[i].Name == "Sword" {
+			rl.DrawTexture(e.Sprites["MINISWORD"], 0, 900, rl.RayWhite)
+			rl.DrawText(fmt.Sprintf("x%d", int32(e.Player.Sword)), 0, 1030, 30, rl.RayWhite)
+		}
+		if e.Player.Inventory[i].Name == "Armor" {
+			rl.DrawTexture(e.Sprites["MINIARMOR"], 70, 900, rl.RayWhite)
+			rl.DrawText(fmt.Sprintf("x%d", int32(e.Player.Armor)), 90, 1030, 30, rl.RayWhite)
+		}
+		if e.Player.Inventory[i].Name == "Speed Potion" {
+			rl.DrawTexture(e.Sprites["MINISPEEDPOTION"], 170, 920, rl.RayWhite)
+			rl.DrawText(fmt.Sprintf("x%d", int32(e.Player.SpeedPotion)), 180, 1030, 30, rl.RayWhite)
+		}
+		if e.Player.Inventory[i].Name == "Heal Potion" && e.Player.HealPotion > 0 {
+			rl.DrawTexture(e.Sprites["MINIHEALPOTION"], 250, 920, rl.RayWhite)
+			rl.DrawText(fmt.Sprintf("x%d", int32(e.Player.HealPotion)), 250, 1030, 30, rl.RayWhite)
+			if rl.IsKeyPressed(rl.KeyF) && !Heal {
+				Heal = true
+				go func() {
+					e.Player.Health += 30
+					e.Player.HealPotion -= 1
+					time.Sleep(7 * time.Second)
+					Heal = false
+				}()
+			}
+		}
+	}
 
 	// Mouvement
 	if rl.IsKeyDown(rl.KeyW) || rl.IsKeyDown(rl.KeyUp) {
@@ -186,14 +221,40 @@ func (e *Engine) InGameLogic() {
 		e.StateEngine = PAUSE
 	}
 
-	e.CheckCollisions()
-
 	//Musique
 	if !rl.IsMusicStreamPlaying(e.Music) {
 
 		rl.PlayMusicStream(e.Music)
 	}
 	rl.UpdateMusicStream(e.Music)
+
+	if e.Player.Health <= 0 {
+		e.StateEngine = GAMEOVER
+	}
+	if e.StateEngine == GAMEOVER {
+		// Réinitialiser les mobs
+		for i := range e.Monsters {
+			e.Monsters[i].Health = e.InitialMonsterHealths[i]
+			e.Monsters[i].Position = e.InitialMonsterPositions[i]
+			e.Monsters[i].IsAlive = true
+			minWorth := 1
+			maxWorth := 10
+			for i := range e.Monsters {
+				e.Monsters[i].Worth = rand.Intn(maxWorth-minWorth+1) + minWorth
+			}
+		}
+	}
+
+	for i := range e.Monsters {
+		if e.Player.Position.X >= 2700 && e.Player.Position.X <= 2760 && e.Player.Position.Y >= 1590 && e.Player.Position.Y <= 1610 && e.Monsters[i].Name == "eric" && e.Monsters[i].Health <= 0 {
+			e.StateEngine = END
+		}
+	}
+
+	if e.StateEngine == INGAME {
+		fps := rl.GetFPS()
+		rl.DrawText(fmt.Sprintf("FPS: %d", fps), 1800, 10, 24, rl.RayWhite)
+	}
 
 }
 
@@ -219,8 +280,8 @@ func (e *Engine) GameOverLogic() {
 		rl.StopMusicStream(e.Music)
 		e.Player.Position.X = 615
 		e.Player.Position.Y = 1600
-		e.Player.Health = 100
 		e.Player.Stamina = 100
+		e.Player.Health = e.Player.Armor*100 + 100
 	}
 }
 
@@ -234,22 +295,6 @@ var Attack = false
 
 func (e *Engine) MonsterCollisions() {
 
-	if e.Player.Health <= 0 {
-		e.StateEngine = GAMEOVER
-	}
-	if e.StateEngine == GAMEOVER {
-		// Réinitialiser les mobs
-		for i := range e.Monsters {
-			e.Monsters[i].Health = e.InitialMonsterHealths[i]
-			e.Monsters[i].Position = e.InitialMonsterPositions[i]
-		}
-	}
-
-	if e.StateEngine == INGAME {
-		fps := rl.GetFPS()
-		rl.DrawText(fmt.Sprintf("FPS: %d", fps), 1800, 10, 24, rl.RayWhite)
-	}
-
 	for i, monster := range e.Monsters {
 
 		// porté aggro
@@ -259,7 +304,7 @@ func (e *Engine) MonsterCollisions() {
 			monster.Position.Y < e.Player.Position.Y+150 {
 
 			if e.Monsters[i].Health <= 0 {
-				e.NormalTalk(monster, fmt.Sprintf("0 HP"))
+				e.NormalTalk(monster, "0 HP")
 			} else {
 				e.NormalTalk(monster, fmt.Sprintf("%d HP", monster.Health))
 			}
@@ -377,7 +422,7 @@ var i int = 0
 func (e *Engine) ChatutoCollisions() {
 
 	textechatuto := []string{
-		"Bienvenue, âme errante... Je sais que tu es perdu, confus.", "Ton dernier souvenir est celui du monde des vivants.", "Mais cette réalité t'est désormais inaccessible. Tu es mort.",
+		e.Ciphertalk("Est ce que tu me comprends?"), e.Robottalk("allo?"), "Ah, je vois tu parles francais", "Bienvenue, âme errante... Je sais que tu es perdu, confus.", "Ton dernier souvenir est celui du monde des vivants.", "Mais cette réalité t'est désormais inaccessible. Tu es mort.",
 		"Tu te trouves ici, dans le purgatoire.", "un lieu où les âmes attendent leur jugement.", "Mais ton sort n est pas encore scellé.", "Pour échapper à ce lieu entre la vie et la mort,", "tu devras accomplir une quête.", "Tu devras tuer le chef du purgatoire qui est a l'intérieur de se château.",
 		"Avant de commencer ta quête, il te faut apprendre à te déplacer dans ce lieu étrange.", "Utilise les touches Z, Q, S et D pour te déplacer.", "Avec cela, tu pourras explorer chaque recoin de ce purgatoire.",
 		"Si tu te retrouves en danger, tu peux faire une esquive rapide en appuyant sur Shift.", "Cette manoeuvre pourrait bien te sauver la vie à plus d'une reprise.", "Mais souviens-toi, elle demande de la stamina",
@@ -403,12 +448,8 @@ func (e *Engine) ChatutoCollisions() {
 	}
 }
 
-
 func (e *Engine) NormalTalk(m entity.Monster, sentence string) {
 	e.RenderDialog(m, sentence)
-}
-func (e *Engine) dealertalk(m entity.Dealer, sentence string) {
-	e.Normalexplanation(m, sentence)
 }
 
 func (e *Engine) updatedealer() {
