@@ -150,7 +150,6 @@ func (e *Engine) CheckCollisionstiles() {
 
 	// Définir la hitbox du joueur
 	playerHitbox := rl.NewRectangle(e.Player.Position.X, e.Player.Position.Y, 32, 32)
-
 	tileSize := 32
 	mapWidth := 200
 	newX, newY := e.Player.Position.X, e.Player.Position.Y
@@ -162,8 +161,8 @@ func (e *Engine) CheckCollisionstiles() {
 			for index, tile := range layer.Data {
 				if tile != 0 {
 
-					tileX := (index%mapWidth)*tileSize - 64
-					tileY := (index/mapWidth)*tileSize - 64
+					tileX := (index % mapWidth) * tileSize -60
+					tileY := (index / mapWidth) * tileSize -60
 
 					tileHitbox := rl.Rectangle{
 						X:      float32(tileX),
@@ -172,19 +171,23 @@ func (e *Engine) CheckCollisionstiles() {
 						Height: float32(tileSize),
 					}
 
-					// Gestion des collisions horizontales
-					if rl.CheckCollisionRecs(playerHitbox, tileHitbox) {
-						if playerHitbox.X+playerHitbox.Width > tileHitbox.X && playerHitbox.X < tileHitbox.X {
-							newX = tileHitbox.X - playerHitbox.Width
-						} else if playerHitbox.X < tileHitbox.X+tileHitbox.Width && playerHitbox.X > tileHitbox.X {
-							newX = tileHitbox.X + tileHitbox.Width
+					// Vérification de la collision horizontale (axe X) d'abord
+					updatedPlayerHitboxX := rl.NewRectangle(newX, e.Player.Position.Y, 32, 32)
+					if CheckCollisionenvironnement(updatedPlayerHitboxX, tileHitbox) {
+						if newX < tileHitbox.X {
+							newX = tileHitbox.X - playerHitbox.Width // Collision à gauche
+						} else if newX > tileHitbox.X {
+							newX = tileHitbox.X + tileHitbox.Width // Collision à droite
 						}
+					}
 
-						// Gestion des collisions verticales
-						if playerHitbox.Y+playerHitbox.Height > tileHitbox.Y && playerHitbox.Y < tileHitbox.Y {
-							newY = tileHitbox.Y - playerHitbox.Height
-						} else if playerHitbox.Y < tileHitbox.Y+tileHitbox.Height && playerHitbox.Y > tileHitbox.Y {
-							newY = tileHitbox.Y + tileHitbox.Height
+					// Vérification de la collision verticale (axe Y) en utilisant la nouvelle position X
+					updatedPlayerHitboxY := rl.NewRectangle(newX, newY, 32, 32)
+					if CheckCollisionenvironnement(updatedPlayerHitboxY, tileHitbox) {
+						if newY < tileHitbox.Y {
+							newY = tileHitbox.Y - playerHitbox.Height // Collision au-dessus
+						} else if newY > tileHitbox.Y {
+							newY = tileHitbox.Y + tileHitbox.Height // Collision en dessous
 						}
 					}
 				}
@@ -195,4 +198,19 @@ func (e *Engine) CheckCollisionstiles() {
 	// Mettre à jour la position du joueur après avoir vérifié les collisions
 	e.Player.Position.X = newX
 	e.Player.Position.Y = newY
+}
+
+// Fonction pour vérifier si deux rectangles se chevauchent
+func CheckCollisionenvironnement(playerHitbox, tileHitbox rl.Rectangle) bool {
+    playerRight := playerHitbox.X + playerHitbox.Width
+    playerBottom := playerHitbox.Y + playerHitbox.Height
+    tileRight := tileHitbox.X + tileHitbox.Width
+    tileBottom := tileHitbox.Y + tileHitbox.Height
+
+    // Vérification des chevauchements sur les deux axes
+    horizontalOverlap := playerHitbox.X < tileRight && playerRight > tileHitbox.X
+    verticalOverlap := playerHitbox.Y < tileBottom && playerBottom > tileHitbox.Y
+
+    // Retourne vrai si les deux axes se chevauchent
+    return horizontalOverlap && verticalOverlap
 }
